@@ -26,7 +26,7 @@ import {
   CardBody,
   CardHeader,
   CardHeaderToolbar,
-} from "../../_metronic/_partials/controls";
+} from "../../../_metronic/_partials/controls";
 
 function createData(name, type, input, weights, created, description) {
   return { name, type, input, weights, created, description };

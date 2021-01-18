@@ -11,7 +11,7 @@ export function AsideMenuList({ layoutProps }) {
   const getMenuItemActive = (url, hasSubmenu = false) => {
     return checkIsActive(location, url)
       ? ` ${!hasSubmenu &&
-          "menu-item-active"} menu-item-open menu-item-not-hightlighted`
+      "menu-item-active"} menu-item-open menu-item-not-hightlighted`
       : "";
   };
 
@@ -29,6 +29,20 @@ export function AsideMenuList({ layoutProps }) {
               <SVG src={toAbsoluteUrl("/media/svg/icons/Design/Layers.svg")} />
             </span>
             <span className="menu-text">Dashboard</span>
+          </NavLink>
+        </li>
+        {/*end::1 Level*/}
+
+        {/*begin::1 Level*/}
+        <li
+          className={`menu-item ${getMenuItemActive("/model", false)}`}
+          aria-haspopup="true"
+        >
+          <NavLink className="menu-link" to="/model">
+            <span className="svg-icon menu-icon">
+              <SVG src={toAbsoluteUrl("/media/svg/icons/Design/Layers.svg")} />
+            </span>
+            <span className="menu-text">Model</span>
           </NavLink>
         </li>
         {/*end::1 Level*/}
