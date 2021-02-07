@@ -21,25 +21,15 @@ import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
+import axios from 'axios';
+import { BACKEND_URL } from '../../../config';
+
 import {
   Card,
   CardBody,
   CardHeader,
   CardHeaderToolbar,
 } from "../../../_metronic/_partials/controls";
-
-function createData(name, type, input, weights, created, description) {
-  return { name, type, input, weights, created, description };
-}
-
-const rows = [
-  createData('YOLOv4 initial', "YOLOv4 pytorch", "416x416", 255, "01/12/2020", 'Initial YOLOv4 model using default hyperparameters'),
-  createData('YOLOv4-r', "YOLOv4 pytorch", "544x320", 254, "01/12/2020", 'Initial YOLOv4 model changed input size (ratio)'),
-  createData('YOLOv4-a', "YOLOv4 pytorch", "416x416", 255, "01/12/2020", 'Initial YOLOv4 model changed anchor boxes'),
-  createData('YOLOv4-s', "YOLOv4 pytorch", "512x512", 255, "01/12/2020", 'Initial YOLOv4 model changed input size (increase size)'),
-  createData('YOLOv4-n', "YOLOv4 pytorch", "416x416", 255, "01/12/2020", 'Initial YOLOv4 model changed network (feature map)'),
-  createData('YOLOv4-final', "YOLOv4 pytorch", "672x384", 255, "01/12/2020", 'Initial YOLOv4 model combine all optimizations'),
-];
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -157,31 +147,17 @@ const EnhancedTableToolbar = props => {
       })}
     >
       <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h6" id="tableTitle">
-            Models
-          </Typography>
-        )}
+        <Typography variant="h6" id="tableTitle">
+          Models
+        </Typography>
       </div>
       <div className={classes.spacer} />
       <div className={classes.actions}>
-        {numSelected > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton aria-label="Delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton aria-label="Filter list">
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+        <Tooltip title="Filter list">
+          <IconButton aria-label="Filter list">
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
       </div>
     </Toolbar>
   );
@@ -216,6 +192,26 @@ export function ModelPage() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rows, setRows] = React.useState([]);
+
+  // React.useEffect(async () => {
+  //   async function fetchData () {
+  //       const result = await axios(
+  //         'http://192.168.20.152:8000/api/v1/models'
+  //       );
+  //       console.log(result);
+  //     }
+  //     fetchData();
+  // }, []);
+
+  React.useEffect(() => {
+    async function fetchData() {
+      const result = await fetch('http://192.168.20.152:8000/api/v1/models');
+      const jsonResult = await result.json();
+      setRows(jsonResult);
+    }
+    fetchData();
+  }, []);
 
   function handleRequestSort(event, property) {
     const isDesc = orderBy === property && order === 'desc';
@@ -230,26 +226,6 @@ export function ModelPage() {
       return;
     }
     setSelected([]);
-  }
-
-  function handleClick(event, name) {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
   }
 
   function handleChangePage(event, newPage) {
@@ -296,12 +272,9 @@ export function ModelPage() {
                   return (
                     <TableRow
                       hover
-                      onClick={event => handleClick(event, row.name)}
                       role="checkbox"
-                      aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
-                      selected={isItemSelected}
+                      key={row.id}
                     >
                       {/* <TableCell padding="checkbox">
                         <Checkbox
@@ -312,10 +285,10 @@ export function ModelPage() {
                       <TableCell component="th" id={labelId} scope="row">
                         {row.name}
                       </TableCell>
-                      <TableCell>{row.type}</TableCell>
-                      <TableCell>{row.input}</TableCell>
-                      <TableCell  align="right">{row.weights}</TableCell>
-                      <TableCell >{row.created}</TableCell>
+                      <TableCell>{row.model_type}</TableCell>
+                      <TableCell>{`${row.input_width}x${row.input_height}`}</TableCell>
+                      <TableCell  align="right">{row.weight_size}</TableCell>
+                      <TableCell >{row.created_time}</TableCell>
                       <TableCell>{row.description}</TableCell>
                     </TableRow>
                   );

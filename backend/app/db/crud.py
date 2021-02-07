@@ -5,6 +5,7 @@ import typing as t
 from . import models, schemas
 from app.core.security import get_password_hash
 
+# users
 
 def get_user(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -67,3 +68,24 @@ def edit_user(
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def get_models(
+    db: Session, skip: int = 0, limit: int = 100
+) -> t.List[schemas.Model]:
+    return db.query(models.Model).offset(skip).limit(limit).all()
+
+def create_model(db: Session, model: schemas.UserCreate):
+    db_model = models.Model(
+        name = model.name,
+        is_active = model.is_active,
+        created_time = model.created_time,
+        description = model.description,
+        input_width = model.input_width,
+        input_height = model.input_height,
+        weight_size = model.weight_size,
+        model_type = model.model_type
+    )
+    db.add(db_model)
+    db.commit()
+    db.refresh(db_model)
+    return db_model
