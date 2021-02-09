@@ -12,24 +12,14 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
 import axios from 'axios';
 import { BACKEND_URL } from '../../../config';
 
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardHeaderToolbar,
-} from "../../../_metronic/_partials/controls";
+import { Card } from "../../../_metronic/_partials/controls";
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -65,7 +55,7 @@ const headRows = [
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
@@ -73,14 +63,6 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        {/* <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'Select all desserts' }}
-          />
-        </TableCell> */}
         {headRows.map(row => (
           <TableCell
             key={row.id}
@@ -102,9 +84,7 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -138,13 +118,10 @@ const useToolbarStyles = makeStyles(theme => ({
 
 const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
 
   return (
     <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
+      className={clsx(classes.root)}
     >
       <div className={classes.title}>
         <Typography variant="h6" id="tableTitle">
@@ -163,9 +140,7 @@ const EnhancedTableToolbar = props => {
   );
 };
 
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
+EnhancedTableToolbar.propTypes = {};
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -188,9 +163,8 @@ export function ModelPage() {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, ] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = React.useState([]);
 
@@ -206,9 +180,8 @@ export function ModelPage() {
 
   React.useEffect(() => {
     async function fetchData() {
-      const result = await fetch('http://192.168.20.152:8000/api/v1/models');
-      const jsonResult = await result.json();
-      setRows(jsonResult);
+      const result = await axios(`${BACKEND_URL}/models`);
+      setRows(result.data);
     }
     fetchData();
   }, []);
@@ -219,15 +192,6 @@ export function ModelPage() {
     setOrderBy(property);
   }
 
-  function handleSelectAllClick(event) {
-    if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  }
-
   function handleChangePage(event, newPage) {
     setPage(newPage);
   }
@@ -236,18 +200,12 @@ export function ModelPage() {
     setRowsPerPage(+event.target.value);
   }
 
-  function handleChangeDense(event) {
-    setDense(event.target.checked);
-  }
-
-  const isSelected = name => selected.indexOf(name) !== -1;
-
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
       <Card>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar />
         <div className={classes.tableWrapper}>
           <Table
             className={classes.table}
@@ -255,10 +213,8 @@ export function ModelPage() {
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -266,7 +222,6 @@ export function ModelPage() {
               {stableSort(rows, getSorting(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (

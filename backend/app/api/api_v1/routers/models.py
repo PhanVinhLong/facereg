@@ -3,11 +3,10 @@ import typing as t
 
 from app.db.session import get_db
 from app.db.crud import (
-    get_users,
     get_models,
     create_model
 )
-from app.db.schemas import UserCreate, UserEdit, User, UserOut, ModelCreate, Model
+from app.db.schemas import ModelCreate, Model
 from app.core.auth import get_current_active_user, get_current_active_superuser
 
 models_router = r = APIRouter()

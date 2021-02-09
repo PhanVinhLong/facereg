@@ -6,13 +6,14 @@ import mockRemarks from "../../app/modules/ECommerce/__mocks__/mockRemark";
 import mockSpecifications from "../../app/modules/ECommerce/__mocks__/mockSpecification";
 
 export default function mockAxios(axios) {
-  const mock = new MockAdapter(axios, { delayResponse: 300 });
+  // const mock = new MockAdapter(axios, { delayResponse: 300 });
 
-  mockAuth(mock);
-  mockCustomers(mock);
-  mockProducts(mock);
-  mockRemarks(mock);
-  mockSpecifications(mock);
+  // mockAuth(mock);
+  // mockCustomers(mock);
+  // mockProducts(mock);
+  // mockRemarks(mock);
+  // mockSpecifications(mock);
 
-  return mock;
+  // return mock;
+  return false;
 }

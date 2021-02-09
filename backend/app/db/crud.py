@@ -74,7 +74,7 @@ def get_models(
 ) -> t.List[schemas.Model]:
     return db.query(models.Model).offset(skip).limit(limit).all()
 
-def create_model(db: Session, model: schemas.UserCreate):
+def create_model(db: Session, model: schemas.ModelCreate):
     db_model = models.Model(
         name = model.name,
         is_active = model.is_active,
@@ -84,6 +84,26 @@ def create_model(db: Session, model: schemas.UserCreate):
         input_height = model.input_height,
         weight_size = model.weight_size,
         model_type = model.model_type
+    )
+    db.add(db_model)
+    db.commit()
+    db.refresh(db_model)
+    return db_model
+
+def get_detections(
+    db: Session, skip: int = 0, limit: int = 100
+) -> t.List[schemas.Detection]:
+    return db.query(models.Detection).offset(skip).limit(limit).all()
+
+def create_detection(db: Session, detection: schemas.DetectionCreate):
+    db_detection = models.Detection(
+        name = detection.name,
+        detection_type = detection.detection_type,
+        model_id = detection.model_id,
+        created_time = detection.created_time,
+        created_by = detection.created_by,
+        status = detection.status,
+        description = detection.description,
     )
     db.add(db_model)
     db.commit()

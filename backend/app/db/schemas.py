@@ -1,6 +1,31 @@
 from pydantic import BaseModel
 import typing as t
+import inspect
+from fastapi import Form
 import datetime
+
+def as_form(cls: t.Type[BaseModel]):
+    """
+    Adds an as_form class method to decorated models. The as_form class method
+    can be used with FastAPI endpoints
+    """
+    new_params = [
+        inspect.Parameter(
+            field.alias,
+            inspect.Parameter.POSITIONAL_ONLY,
+            default=(Form(field.default) if not field.required else Form(...)),
+        )
+        for field in cls.__fields__.values()
+    ]
+
+    async def _as_form(**data):
+        return cls(**data)
+
+    sig = inspect.signature(_as_form)
+    sig = sig.replace(parameters=new_params)
+    _as_form.__signature__ = sig
+    setattr(cls, "as_form", _as_form)
+    return cls
 
 class UserBase(BaseModel):
     email: str
@@ -74,6 +99,43 @@ class ModelCreate(ModelBase):
 
 class Model(ModelBase):
     id: int
+
+    class Config:
+        orm_mode = True
+
+class DetectionBase(BaseModel):
+
+    name: str
+    detection_type: str
+    model_id: int
+    created_time: datetime.datetime
+    created_by: int
+    status: str
+    description: str
+
+@as_form
+class DetectionCreate(DetectionBase):
+
+    class Config:
+        orm_mode = True
+
+        schema_extra = {
+            "example": {
+                "name": "YOLOv4 pytorch",
+                "detection_type": "image",
+                "model_id": 0,
+                "created_time": "2020-12-01T15:53:00+08:00",
+                "created_by": 1,
+                "status": "Success",
+                "description": "Detect objects in image",
+            }
+        }
+
+class Detection(ModelBase):
+    id: int
+    result: str
+    ori_name: str
+    res_name: str
 
     class Config:
         orm_mode = True

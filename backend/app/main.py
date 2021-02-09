@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.api_v1.routers.users import users_router
 from app.api.api_v1.routers.auth import auth_router
 from app.api.api_v1.routers.models import models_router
+from app.api.api_v1.routers.detections import detections_router
 
 from app.core import config
 from app.db.session import SessionLocal
@@ -56,6 +57,12 @@ app.include_router(
     models_router,
     prefix="/api/v1",
     tags=["models"],
+    # dependencies=[Depends(get_current_active_user)],
+)
+app.include_router(
+    detections_router,
+    prefix="/api/v1",
+    tags=["detections"],
     # dependencies=[Depends(get_current_active_user)],
 )
 app.include_router(auth_router, prefix="/api", tags=["auth"])

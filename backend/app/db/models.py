@@ -32,8 +32,13 @@ class Detection(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
+    detection_type = Column(String)
+    model_id = Column(Integer)
     created_time = Column(DateTime)
     created_by = Column(String)
     status = Column(String)
+    description = Column(String)
     result = Column(String)
-    
+    ori_name = Column(String)
+    res_name = Column(String)
+
