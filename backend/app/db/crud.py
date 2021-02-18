@@ -95,7 +95,7 @@ def get_detections(
 ) -> t.List[schemas.Detection]:
     return db.query(models.Detection).offset(skip).limit(limit).all()
 
-def create_detection(db: Session, detection: schemas.DetectionCreate):
+def create_detection(db: Session, detection: schemas.DetectionCreate, ori_filename: str, res_filename: str):
     db_detection = models.Detection(
         name = detection.name,
         detection_type = detection.detection_type,
@@ -104,8 +104,10 @@ def create_detection(db: Session, detection: schemas.DetectionCreate):
         created_by = detection.created_by,
         status = detection.status,
         description = detection.description,
+        ori_filename = ori_filename,
+        res_filename = res_filename
     )
-    db.add(db_model)
+    db.add(db_detection)
     db.commit()
-    db.refresh(db_model)
-    return db_model
+    db.refresh(db_detection)
+    return db_detection

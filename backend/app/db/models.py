@@ -38,7 +38,8 @@ class Detection(Base):
     created_by = Column(String)
     status = Column(String)
     description = Column(String)
-    result = Column(String)
-    ori_name = Column(String)
-    res_name = Column(String)
-
+    ori_filename = Column(String)
+    res_filename = Column(String)
+    process_time = Column(Integer)
+    results = Column(String)
+    

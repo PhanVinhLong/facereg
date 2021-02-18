@@ -42,8 +42,7 @@ export function AuthPage() {
                   Welcome to YDET!
                 </h3>
                 <p className="font-weight-lighter text-white opacity-80">
-                  The ultimate Bootstrap & React 16 admin theme framework for
-                  next generation web apps.
+                  Object detection website.
                 </p>
               </div>
               {/* end:: Aside content */}

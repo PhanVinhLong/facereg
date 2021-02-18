@@ -1,6 +1,5 @@
 
 import React from 'react';
-import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -10,11 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import { useHistory } from 'react-router-dom';
 
 import axios from 'axios';
 import { BACKEND_URL } from '../../../config';
@@ -46,12 +41,12 @@ function getSorting(order, orderBy) {
 }
 
 const headRows = [
-  { id: 'name', numeric: false, disablePadding: true, label: 'Model name' },
-  { id: 'type', numeric: false, disablePadding: false, label: 'Type' },
-  { id: 'input', numeric: false, disablePadding: false, label: 'Input size' },
-  { id: 'weights', numeric: true, disablePadding: false, label: 'Weights size (MB)' },
-  { id: 'created', numeric: false, disablePadding: false, label: 'Created date' },
-  { id: 'description', numeric: false, disablePadding: false, label: 'Description' },
+  { id: 'name', numeric: false, label: 'Name' },
+  { id: 'type', numeric: false, label: 'Type' },
+  { id: 'created', numeric: false, label: 'Created time' },
+  { id: 'status', numeric: false, label: 'Status' },
+  { id: 'description', numeric: false, label: 'Description' },
+  { id: 'action', numeric: false, label: 'Action' },
 ];
 
 function EnhancedTableHead(props) {
@@ -90,32 +85,6 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-const useToolbarStyles = makeStyles(theme => ({
-  root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-  },
-  highlight:
-    theme.palette.type === 'light'
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  spacer: {
-    flex: '1 1 100%',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-  },
-}));
-
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -127,9 +96,10 @@ const useStyles = makeStyles(theme => ({
   },
   table: {
     minWidth: 750,
+    paddingRight: 15
   },
   tableWrapper: {
-    overflowX: 'auto',
+    overflowX: 'auto'
   },
 }));
 
@@ -138,23 +108,13 @@ export function DetectionPage() {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [page, setPage] = React.useState(0);
-  const [dense, ] = React.useState(false);
+  const [dense,] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = React.useState([]);
 
-  // React.useEffect(async () => {
-  //   async function fetchData () {
-  //       const result = await axios(
-  //         'http://192.168.20.152:8000/api/v1/models'
-  //       );
-  //       console.log(result);
-  //     }
-  //     fetchData();
-  // }, []);
-
   React.useEffect(() => {
     async function fetchData() {
-      const result = await axios(`${BACKEND_URL}/models`);
+      const result = await axios(`${BACKEND_URL}/detections`);
       setRows(result.data);
     }
     fetchData();
@@ -176,6 +136,8 @@ export function DetectionPage() {
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
+  const history = useHistory();
+
   return (
     <div className={classes.root}>
       <Card>
@@ -184,7 +146,9 @@ export function DetectionPage() {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={()=>{}}
+              onClick={() => {
+                history.push("/detection/new");
+              }}
             >
               New Detection
             </button>
@@ -211,24 +175,17 @@ export function DetectionPage() {
                   return (
                     <TableRow
                       hover
-                      role="checkbox"
                       tabIndex={-1}
                       key={row.id}
                     >
-                      {/* <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ 'aria-labelledby': labelId }}
-                        />
-                      </TableCell> */}
                       <TableCell component="th" id={labelId} scope="row">
                         {row.name}
                       </TableCell>
-                      <TableCell>{row.model_type}</TableCell>
-                      <TableCell>{`${row.input_width}x${row.input_height}`}</TableCell>
-                      <TableCell  align="right">{row.weight_size}</TableCell>
-                      <TableCell >{row.created_time}</TableCell>
+                      <TableCell>{row.detection_type}</TableCell>
+                      <TableCell>{row.created_time}</TableCell>
+                      <TableCell>{row.status}</TableCell>
                       <TableCell>{row.description}</TableCell>
+                      <TableCell>Action</TableCell>
                     </TableRow>
                   );
                 })}
@@ -256,10 +213,6 @@ export function DetectionPage() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Card>
-      {/* <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      /> */}
     </div>
   );
 }

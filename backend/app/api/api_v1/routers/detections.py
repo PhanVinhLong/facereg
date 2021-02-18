@@ -40,11 +40,10 @@ async def detection_create(
     filename, file_extension = os.path.splitext(image.filename)
     new_filename = filename + '_res' + file_extension
 
-    with open(image.filename, "wb") as buffer:
+    with open(os.path.join(static_dir, image.filename), "wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
-    return {"filename": image.filename}
 
-    return create_detection(db, detection)
+    return create_detection(db, detection, image.filename, new_filename)
 
 @r.get(
     "/detections",

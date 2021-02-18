@@ -1,13 +1,22 @@
 import axios from "axios";
 
-export const LOGIN_URL = "api/auth/login";
+export const LOGIN_URL = "http://192.168.20.152:8000/api/token";
 export const REGISTER_URL = "api/auth/register";
 export const REQUEST_PASSWORD_URL = "api/auth/forgot-password";
 
-export const ME_URL = "api/me";
+export const ME_URL = "http://192.168.20.152:8000/api/v1/users/me";
 
-export function login(email, password) {
-  return axios.post(LOGIN_URL, { email, password });
+const config = {
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+}
+
+export function login(username, password) {
+  const params = new URLSearchParams()
+  params.append('username', username)
+  params.append('password', password)
+  return axios.post(LOGIN_URL, params, config);
 }
 
 export function register(email, fullname, username, password) {

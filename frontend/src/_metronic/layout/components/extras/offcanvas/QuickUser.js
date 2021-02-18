@@ -8,7 +8,7 @@ import { toAbsoluteUrl } from "../../../../_helpers";
 
 export function QuickUser() {
   const history = useHistory();
-  const user = useSelector((state) => state.auth.user, shallowEqual);
+  const user = JSON.parse(localStorage.getItem('user'));
   const logoutClick = () => {
     const toggle = document.getElementById("kt_quick_user_toggle");
     if (toggle) {
@@ -38,12 +38,12 @@ export function QuickUser() {
       <div className="offcanvas-content pr-5 mr-n5">
         <div className="d-flex align-items-center mt-5">
           <div className="symbol symbol-100 mr-5">
-            <div
+            {/* <div
               className="symbol-label"
               style={{
                 backgroundImage: `url(${user.pic})`,
               }}
-            />
+            /> */}
             <i className="symbol-badge bg-success" />
           </div>
           <div className="d-flex flex-column">
@@ -51,7 +51,7 @@ export function QuickUser() {
               href="#"
               className="font-weight-bold font-size-h5 text-dark-75 text-hover-primary"
             >
-              {user.firstname} {user.lastname}
+              {user.first_name} {user.last_name}
             </a>
             <div className="text-muted mt-1">{user.occupation}</div>
             <div className="navi mt-2">

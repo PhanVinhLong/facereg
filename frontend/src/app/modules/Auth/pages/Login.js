@@ -4,8 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { connect } from "react-redux";
 import { FormattedMessage, injectIntl } from "react-intl";
-import * as auth from "../_redux/authRedux";
-import { login } from "../_redux/authCrud";
+import auth from "../../../utils/auth";
 
 /*
   INTL (i18n) docs:
@@ -18,8 +17,8 @@ import { login } from "../_redux/authCrud";
 */
 
 const initialValues = {
-  email: "admin@demo.com",
-  password: "demo",
+  email: "longpv.se@gmail.com",
+  password: "123456",
 };
 
 function Login(props) {
@@ -71,10 +70,10 @@ function Login(props) {
     onSubmit: (values, { setStatus, setSubmitting }) => {
       enableLoading();
       setTimeout(() => {
-        login(values.email, values.password)
-          .then(({ data: { accessToken } }) => {
+        auth.login(values.email, values.password)
+        // .then(data => console.log(data))
+          .then((access_token) => {
             disableLoading();
-            props.login(accessToken);
           })
           .catch(() => {
             disableLoading();
@@ -114,8 +113,8 @@ function Login(props) {
         ) : (
           <div className="mb-10 alert alert-custom alert-light-info alert-dismissible">
             <div className="alert-text ">
-              Use account <strong>admin@demo.com</strong> and password{" "}
-              <strong>demo</strong> to continue.
+              Use account <strong>longpv.se@gmail.com</strong> and password{" "}
+              <strong>123456</strong> to continue.
             </div>
           </div>
         )}

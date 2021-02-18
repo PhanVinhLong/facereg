@@ -11,15 +11,15 @@ def init() -> None:
 
     Base.metadata.create_all(bind=engine)
 
-    # create_user(
-    #     db,
-    #     UserCreate(
-    #         email="longpv.se@gmail.com",
-    #         password="123456",
-    #         is_active=True,
-    #         is_superuser=True,
-    #     ),
-    # )
+    create_user(
+        db,
+        UserCreate(
+            email="longpv.se@gmail.com",
+            password="123456",
+            is_active=True,
+            is_superuser=True,
+        ),
+    )
 
     create_model(
         db,

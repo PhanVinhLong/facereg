@@ -5,6 +5,7 @@ import { BuilderPage } from "./pages/BuilderPage";
 
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { DetectionPage } from "./pages/detection/DetectionPage";
+import { NewDetectionPage } from "./pages/detection/NewDetectionPage";
 import { ModelPage } from "./pages/model/ModelPage";
 
 const GoogleMaterialPage = lazy(() =>
@@ -34,6 +35,7 @@ export default function BasePage() {
           <Redirect exact from="/" to="/dashboard" />
         }
         <ContentRoute path="/dashboard" component={DashboardPage} />
+        <ContentRoute path="/detection/new" component={NewDetectionPage} />
         <ContentRoute path="/detection" component={DetectionPage} />
         <ContentRoute path="/model" component={ModelPage} />
 

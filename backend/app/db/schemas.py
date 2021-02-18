@@ -119,23 +119,12 @@ class DetectionCreate(DetectionBase):
     class Config:
         orm_mode = True
 
-        schema_extra = {
-            "example": {
-                "name": "YOLOv4 pytorch",
-                "detection_type": "image",
-                "model_id": 0,
-                "created_time": "2020-12-01T15:53:00+08:00",
-                "created_by": 1,
-                "status": "Success",
-                "description": "Detect objects in image",
-            }
-        }
-
-class Detection(ModelBase):
+class Detection(DetectionBase):
     id: int
-    result: str
-    ori_name: str
-    res_name: str
+    ori_filename: t.Optional[str]
+    res_filename: t.Optional[str]
+    process_time: t.Optional[int]
+    results: t.Optional[str]
 
     class Config:
         orm_mode = True
