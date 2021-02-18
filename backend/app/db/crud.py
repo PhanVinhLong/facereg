@@ -95,6 +95,11 @@ def get_detections(
 ) -> t.List[schemas.Detection]:
     return db.query(models.Detection).offset(skip).limit(limit).all()
 
+def get_pending_detections(
+    db: Session, skip: int = 0, limit: int = 100
+) -> t.List[schemas.Detection]:
+    return db.query(models.Detection).filter_by(models.Detection.status=='Pending').offset(skip).limit(limit).all()
+
 def create_detection(db: Session, detection: schemas.DetectionCreate, ori_filename: str, res_filename: str):
     db_detection = models.Detection(
         name = detection.name,

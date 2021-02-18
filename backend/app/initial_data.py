@@ -24,7 +24,7 @@ def init() -> None:
     create_model(
         db,
         ModelCreate(
-            name="YOLOv4 initial",
+            name="YOLOv4-init",
             is_active=True,
             model_type="YOLOv4 pytorch",
             created_time="2020-12-01T15:53:00+08:00",
@@ -66,7 +66,7 @@ def init() -> None:
     create_model(
         db,
         ModelCreate(
-            name="YOLOv4-a",
+            name="YOLOv4-s",
             is_active=True,
             model_type="YOLOv4 pytorch",
             created_time="2020-12-01T15:53:00+08:00",
@@ -84,7 +84,7 @@ def init() -> None:
             is_active=True,
             model_type="YOLOv4 pytorch",
             created_time="2020-12-01T15:53:00+08:00",
-            description="YOLOv4 model changed input size (increase size)",
+            description="YOLOv4 model changed network structure",
             input_width=416,
             input_height=416,
             weight_size=255

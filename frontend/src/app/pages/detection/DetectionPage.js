@@ -1,7 +1,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { lighten, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -177,6 +177,9 @@ export function DetectionPage() {
                       hover
                       tabIndex={-1}
                       key={row.id}
+                      onClick={() => {
+                        history.push(`/detection/${row.id}`)
+                      }}
                     >
                       <TableCell component="th" id={labelId} scope="row">
                         {row.name}

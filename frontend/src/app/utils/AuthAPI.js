@@ -19,9 +19,9 @@ const authProvider = {
       })
       .then(({ access_token }) => {
         const decodedToken = decodeJwt(access_token);
-        if (decodedToken.permissions !== 'admin') {
-          throw new Error('Forbidden');
-        }
+        // if (decodedToken.permissions !== 'admin') {
+        //   throw new Error('Forbidden');
+        // }
         localStorage.setItem('token', access_token);
         localStorage.setItem('permissions', decodedToken.permissions);
 
@@ -33,10 +33,11 @@ const authProvider = {
           }
         };
 
-        axios.get(URL, config).then((response) =>
-          localStorage.setItem('user', JSON.stringify(response.data)))
-
-        return Promise.resolve(access_token);
+        return axios.get(URL, config)
+          .then((response) => {
+            localStorage.setItem('user', JSON.stringify(response.data));
+            return access_token;
+          })
       });
   },
   logout: () => {

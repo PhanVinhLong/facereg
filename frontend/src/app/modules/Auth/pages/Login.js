@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { connect } from "react-redux";
 import { FormattedMessage, injectIntl } from "react-intl";
 import auth from "../../../utils/AuthAPI";
+import { createBrowserHistory } from 'history';
 
 /*
   INTL (i18n) docs:
@@ -22,8 +23,11 @@ const initialValues = {
 };
 
 function Login(props) {
+  const history = createBrowserHistory();
+
   const { intl } = props;
   const [loading, setLoading] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .email("Wrong email format")
@@ -74,6 +78,9 @@ function Login(props) {
         // .then(data => console.log(data))
           .then((access_token) => {
             disableLoading();
+            // setIsLoggedIn(true);
+            history.push("/");
+            history.go();
           })
           .catch(() => {
             disableLoading();
@@ -89,6 +96,7 @@ function Login(props) {
   });
 
   return (
+    // !isLoggedIn ? <Redirect to='/detection' /> : 
     <div className="login-form login-signin" id="kt_login_signin_form">
       {/* begin::Head */}
       <div className="text-center mb-10 mb-lg-20">

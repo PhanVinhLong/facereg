@@ -15,6 +15,10 @@ from app.core.auth import get_current_active_user
 from app.core.celery_app import celery_app
 from app import tasks
 
+from fastapi.responses import FileResponse
+import os
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI(
     title=config.PROJECT_NAME, docs_url="/api/docs", openapi_url="/api"
 )
@@ -34,6 +38,11 @@ async def db_session_middleware(request: Request, call_next):
     request.state.db.close()
     return response
 
+app.mount("/api/files", StaticFiles(directory="./app/public"), name="files")
+
+# @app.get("/api/files/{filename}")
+# async def get_file(filename: str):
+#     return FileResponse(os.path.join(statics, filename))
 
 @app.get("/api/v1")
 async def root():

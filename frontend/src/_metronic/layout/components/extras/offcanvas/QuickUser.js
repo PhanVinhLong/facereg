@@ -2,7 +2,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import SVG from "react-inlinesvg";
-import { shallowEqual, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { toAbsoluteUrl } from "../../../../_helpers";
 
@@ -41,7 +40,7 @@ export function QuickUser() {
             {/* <div
               className="symbol-label"
               style={{
-                backgroundImage: `url(${user.pic})`,
+                backgroundImage: `url(${user!==null ? user.pic})`,
               }}
             /> */}
             <i className="symbol-badge bg-success" />
@@ -51,9 +50,9 @@ export function QuickUser() {
               href="#"
               className="font-weight-bold font-size-h5 text-dark-75 text-hover-primary"
             >
-              {user.first_name} {user.last_name}
+              {user!==null ? user.first_name : ''} {user!==null ? user.last_name : ''}
             </a>
-            <div className="text-muted mt-1">{user.occupation}</div>
+            {/* <div className="text-muted mt-1">{user!==null ? user.occupation}</div> */}
             <div className="navi mt-2">
               <a className="navi-item cursor-pointer">
                 <span className="navi-link p-0 pb-2">
@@ -67,7 +66,7 @@ export function QuickUser() {
                     </span>
                   </span>
                   <span className="navi-text text-muted text-hover-primary">
-                    {user.email}
+                    {user!==null ? user.email : ''}
                   </span>
                 </span>
               </a>

@@ -11,6 +11,8 @@ import { BACKEND_URL } from '../../../config';
 
 import { Card, CardHeader, CardBody, CardHeaderToolbar } from "../../../_metronic/_partials/controls";
 
+import detectionAPI from "../../utils/DetectionAPI";
+
 const user = JSON.parse(localStorage.getItem('user'));
 
 const useStyles = makeStyles(theme => ({
@@ -45,6 +47,10 @@ const DetectionEditSchema = Yup.object().shape({
     .min(2, "Minimum 2 symbols")
     .max(50, "Maximum 50 symbols")
     .required("Name is required"),
+  // description: Yup.string()
+  //   .min(2, "Minimum 2 symbols")
+  //   .max(500, "Maximum 500 symbols")
+  //   .required("Detection is required"),
   image: Yup.mixed()
     .requiredWhenDefined()
     .test('required', "File is required", value => !(value && Object.keys(value).length === 0 && value.constructor === Object))
@@ -64,6 +70,7 @@ export function NewDetectionPage() {
   const ref = useRef(null);
 
   const [models, setModels] = React.useState([]);
+  const [image, setImage] = React.useState();
 
   React.useEffect(() => {
     async function fetchData() {
@@ -88,7 +95,7 @@ export function NewDetectionPage() {
             <button
               type="button"
               className="btn btn-light"
-              onClick={()=>{
+              onClick={() => {
                 history.push('/detection');
               }}
             >
@@ -96,7 +103,10 @@ export function NewDetectionPage() {
             Back
           </button>
             {`  `}
-            <button className="btn btn-light ml-2" onClick={()=>ref.current.resetForm(initialValues)}>
+            <button className="btn btn-light ml-2" onClick={() => {
+              setImage(null);
+              ref.current.resetForm(initialValues)
+            }}>
               <i className="fa fa-redo"></i>
             Reset
           </button>
@@ -126,8 +136,20 @@ export function NewDetectionPage() {
                 ...values,
                 created_time: new Date().toISOString(),
                 created_by: user.id,
-              }
-              console.log(values);
+                status: 'Pending'
+              };
+              detectionAPI.createDetection(values)
+                .then(response => {
+                  if (response.status >= 200 && response.status < 300) {
+                    alert('New detection created successful.');
+                    history.push('/detection');
+                    history.go();
+                  } else {
+                    alert('Error status ' + String(response.status));
+                    history.push('/detection');
+                    history.go();
+                  }
+                });
             }}
           >
             {({ handleSubmit, setFieldValue, errors, resetForm }) => (
@@ -174,6 +196,7 @@ export function NewDetectionPage() {
                     <br />
                     <input id="image" name="image" type="file" onChange={(event) => {
                       setFieldValue("image", event.currentTarget.files[0]);
+                      setImage(event.currentTarget.files[0]);
                     }} />
                     <br />
                     {errors["image"] ?
@@ -193,6 +216,9 @@ export function NewDetectionPage() {
               </>
             )}
           </Formik>
+          <div className="text-center">
+            {image && <img alt='selected' src={URL.createObjectURL(image)} className="img-thumbnail" />}
+          </div>
         </CardBody>
       </Card>
     </div>

@@ -6,6 +6,7 @@ import { BuilderPage } from "./pages/BuilderPage";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { DetectionPage } from "./pages/detection/DetectionPage";
 import { NewDetectionPage } from "./pages/detection/NewDetectionPage";
+import { ViewDetectionPage } from "./pages/detection/ViewDetectionPage";
 import { ModelPage } from "./pages/model/ModelPage";
 
 const GoogleMaterialPage = lazy(() =>
@@ -27,7 +28,7 @@ export default function BasePage() {
   // }, []) // [] - is required if you need only one call
   // https://reactjs.org/docs/hooks-reference.html#useeffect
 
-  return (
+  return (  
     <Suspense fallback={<LayoutSplashScreen />}>
       <Switch>
         {
@@ -36,6 +37,7 @@ export default function BasePage() {
         }
         <ContentRoute path="/dashboard" component={DashboardPage} />
         <ContentRoute path="/detection/new" component={NewDetectionPage} />
+        <ContentRoute path="/detection/:id" component={ViewDetectionPage} />
         <ContentRoute path="/detection" component={DetectionPage} />
         <ContentRoute path="/model" component={ModelPage} />
 

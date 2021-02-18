@@ -108,10 +108,11 @@ class DetectionBase(BaseModel):
     name: str
     detection_type: str
     model_id: int
-    created_time: datetime.datetime
-    created_by: int
-    status: str
-    description: str
+    created_time: t.Optional[datetime.datetime]
+    created_by: t.Optional[str]
+    status: t.Optional[str]
+    description: t.Optional[str]
+    ori_url: t.Optional[str]
 
 @as_form
 class DetectionCreate(DetectionBase):
@@ -123,6 +124,7 @@ class Detection(DetectionBase):
     id: int
     ori_filename: t.Optional[str]
     res_filename: t.Optional[str]
+    res_url: t.Optional[str]
     process_time: t.Optional[int]
     results: t.Optional[str]
 

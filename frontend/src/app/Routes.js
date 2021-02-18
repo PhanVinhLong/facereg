@@ -13,6 +13,7 @@ import { Logout, AuthPage } from "./modules/Auth";
 import ErrorsPage from "./modules/ErrorsExamples/ErrorsPage";
 
 export function Routes() {
+
   const token = localStorage.getItem('token');
   const isAuthorized = token ? true : false;
 

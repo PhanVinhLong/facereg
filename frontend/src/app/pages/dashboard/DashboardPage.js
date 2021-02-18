@@ -12,20 +12,13 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
 import {
   Card,
-  CardBody,
-  CardHeader,
-  CardHeaderToolbar,
 } from "../../../_metronic/_partials/controls";
 
 function createData(name, type, input, weights, created, description) {
@@ -75,7 +68,7 @@ const headRows = [
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
@@ -214,7 +207,7 @@ export function DashboardPage() {
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   function handleRequestSort(event, property) {
@@ -258,10 +251,6 @@ export function DashboardPage() {
 
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-  }
-
-  function handleChangeDense(event) {
-    setDense(event.target.checked);
   }
 
   const isSelected = name => selected.indexOf(name) !== -1;
