@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { connect } from "react-redux";
 import { FormattedMessage, injectIntl } from "react-intl";
-import auth from "../../../utils/auth";
+import auth from "../../../utils/AuthAPI";
 
 /*
   INTL (i18n) docs:
