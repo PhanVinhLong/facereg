@@ -63,19 +63,19 @@ def init() -> None:
         )
     )
 
-    create_model(
-        db,
-        ModelCreate(
-            name="YOLOv4-s",
-            is_active=True,
-            model_type="YOLOv4 pytorch",
-            created_time="2020-12-01T15:53:00+08:00",
-            description="YOLOv4 model changed input size (increase size)",
-            input_width=512,
-            input_height=512,
-            weight_size=255
-        )
-    )
+    # create_model(
+    #     db,
+    #     ModelCreate(
+    #         name="YOLOv4-s",
+    #         is_active=True,
+    #         model_type="YOLOv4 pytorch",
+    #         created_time="2020-12-01T15:53:00+08:00",
+    #         description="YOLOv4 model changed input size (increase size)",
+    #         input_width=512,
+    #         input_height=512,
+    #         weight_size=255
+    #     )
+    # )
 
     create_model(
         db,

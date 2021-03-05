@@ -46,7 +46,7 @@ const headRows = [
   { id: 'created', numeric: false, label: 'Created time' },
   { id: 'status', numeric: false, label: 'Status' },
   { id: 'description', numeric: false, label: 'Description' },
-  { id: 'action', numeric: false, label: 'Action' },
+  // { id: 'action', numeric: false, label: 'Action' },
 ];
 
 function EnhancedTableHead(props) {
@@ -103,6 +103,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const badges = {
+  Pending: "badge badge-pill badge-secondary",
+  Detecting: "badge badge-pill badge-primary",
+  Done: "badge badge-pill badge-success",
+  Canceled: "badge badge-pill badge-dark"
+}
+
 export function DetectionPage() {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
@@ -150,7 +157,19 @@ export function DetectionPage() {
                 history.push("/detection/new");
               }}
             >
-              New Detection
+              <i className="fas fa-photo-video"></i>
+              New Image/Video Detection
+            </button>
+            {`_`}
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                history.push("/detection/new-stream");
+              }}
+            >
+              <i className="fas fa-video"></i>
+              New Stream Detection
             </button>
           </CardHeaderToolbar>
         </CardHeader>
@@ -178,7 +197,10 @@ export function DetectionPage() {
                       tabIndex={-1}
                       key={row.id}
                       onClick={() => {
-                        history.push(`/detection/${row.id}`)
+                        if (row.detection_type === 'Stream')
+                          history.push(`/detection/stream/${row.id}`)
+                        else
+                          history.push(`/detection/${row.id}`)
                       }}
                     >
                       <TableCell component="th" id={labelId} scope="row">
@@ -186,9 +208,9 @@ export function DetectionPage() {
                       </TableCell>
                       <TableCell>{row.detection_type}</TableCell>
                       <TableCell>{row.created_time}</TableCell>
-                      <TableCell>{row.status}</TableCell>
+                      <TableCell><span className={badges[row.status]}>{row.status}</span></TableCell>
                       <TableCell>{row.description}</TableCell>
-                      <TableCell>Action</TableCell>
+                      {/* <TableCell>Action</TableCell> */}
                     </TableRow>
                   );
                 })}

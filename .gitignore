@@ -1,3 +1,4 @@
 **/node_modules
-frontend_c/
-**/__pycache__
+__pycache__/
+*.py[cod]
+*.weights

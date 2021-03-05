@@ -46,7 +46,7 @@ app.mount("/api/files", StaticFiles(directory="./app/public"), name="files")
 
 @app.get("/api/v1")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hi World"}
 
 
 @app.get("/api/v1/task")

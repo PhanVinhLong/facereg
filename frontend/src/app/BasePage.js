@@ -6,6 +6,8 @@ import { BuilderPage } from "./pages/BuilderPage";
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { DetectionPage } from "./pages/detection/DetectionPage";
 import { NewDetectionPage } from "./pages/detection/NewDetectionPage";
+import { NewStreamDetectionPage } from "./pages/detection/NewStreamDetectionPage";
+import { ViewStreamDetectionPage } from "./pages/detection/ViewStreamDetectionPage";
 import { ViewDetectionPage } from "./pages/detection/ViewDetectionPage";
 import { ModelPage } from "./pages/model/ModelPage";
 
@@ -37,6 +39,8 @@ export default function BasePage() {
         }
         <ContentRoute path="/dashboard" component={DashboardPage} />
         <ContentRoute path="/detection/new" component={NewDetectionPage} />
+        <ContentRoute path="/detection/new-stream" component={NewStreamDetectionPage} />
+        <ContentRoute path="/detection/stream/:id" component={ViewStreamDetectionPage} />
         <ContentRoute path="/detection/:id" component={ViewDetectionPage} />
         <ContentRoute path="/detection" component={DetectionPage} />
         <ContentRoute path="/model" component={ModelPage} />

@@ -105,9 +105,9 @@ class Model(ModelBase):
 
 class DetectionBase(BaseModel):
 
-    name: str
-    detection_type: str
-    model_id: int
+    name: t.Optional[str]
+    detection_type: t.Optional[str]
+    model_id: t.Optional[int]
     created_time: t.Optional[datetime.datetime]
     created_by: t.Optional[str]
     status: t.Optional[str]
@@ -116,6 +116,13 @@ class DetectionBase(BaseModel):
 
 @as_form
 class DetectionCreate(DetectionBase):
+
+    class Config:
+        orm_mode = True
+
+class DetectionEdit(DetectionBase):
+
+    results: t.Optional[str]
 
     class Config:
         orm_mode = True

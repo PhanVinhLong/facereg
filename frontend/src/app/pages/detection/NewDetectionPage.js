@@ -26,13 +26,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const FILE_SIZE = 25 * 1024;
-const SUPPORTED_FORMATS = [
+const FILE_SIZE = 100 * 1024;
+const SUPPORTED_IMAGE_FORMATS = [
   "image/jpg",
   "image/jpeg",
   "image/gif",
   "image/png"
 ];
+const SUPPORTED_VIDEO_FORMATS = [
+  "video/mp4"
+]
 
 function requiredWhenDefined() {
   return this.nullable()
@@ -54,11 +57,11 @@ const DetectionEditSchema = Yup.object().shape({
   image: Yup.mixed()
     .requiredWhenDefined()
     .test('required', "File is required", value => !(value && Object.keys(value).length === 0 && value.constructor === Object))
-    .test('type', "Unsupported File Format", value => SUPPORTED_FORMATS.includes(value.type))
+    .test('type', "Unsupported File Format", value => SUPPORTED_IMAGE_FORMATS.includes(value.type) || SUPPORTED_VIDEO_FORMATS.includes(value.type))
     .test('size', "File Size is too large", value => value.size >= FILE_SIZE)
 });
 
-const detectionTypes = ['Image', 'Video', 'Stream'];
+const detectionTypes = ['Image', 'Video'];
 
 export function NewDetectionPage() {
 
@@ -71,6 +74,7 @@ export function NewDetectionPage() {
 
   const [models, setModels] = React.useState([]);
   const [image, setImage] = React.useState();
+  const [detectionType, setDetectionType] = React.useState();
 
   React.useEffect(() => {
     async function fetchData() {
@@ -100,8 +104,8 @@ export function NewDetectionPage() {
               }}
             >
               <i className="fa fa-arrow-left"></i>
-            Back
-          </button>
+              Back
+            </button>
             {`  `}
             <button className="btn btn-light ml-2" onClick={() => {
               setImage(null);
@@ -141,12 +145,13 @@ export function NewDetectionPage() {
               detectionAPI.createDetection(values)
                 .then(response => {
                   if (response.status >= 200 && response.status < 300) {
+
                     alert('New detection created successful.');
-                    history.push('/detection');
+                    history.push(`/detection/${response.data.id}`);
                     history.go();
                   } else {
                     alert('Error status ' + String(response.status));
-                    history.push('/detection');
+                    history.push('/detection/');
                     history.go();
                   }
                 });
@@ -176,7 +181,7 @@ export function NewDetectionPage() {
                     <div className="col-lg-4">
                       <Select name="model_id" label="Model">
                         {models.map((model) => (
-                          <option key={model.id} value={model.name}>
+                          <option key={model.id} value={model.id}>
                             {model.name}
                           </option>
                         ))}
@@ -196,6 +201,13 @@ export function NewDetectionPage() {
                     <br />
                     <input id="image" name="image" type="file" onChange={(event) => {
                       setFieldValue("image", event.currentTarget.files[0]);
+                      let detection_type = null;
+                      if (SUPPORTED_IMAGE_FORMATS.includes(event.currentTarget.files[0].type)) detection_type = 'Image';
+                      if (SUPPORTED_VIDEO_FORMATS.includes(event.currentTarget.files[0].type)) detection_type = 'Video';
+                      if (detection_type) {
+                        setFieldValue("detection_type", detection_type);
+                        setDetectionType(detection_type);
+                      };
                       setImage(event.currentTarget.files[0]);
                     }} />
                     <br />
@@ -217,7 +229,8 @@ export function NewDetectionPage() {
             )}
           </Formik>
           <div className="text-center">
-            {image && <img alt='selected' src={URL.createObjectURL(image)} className="img-thumbnail" />}
+            {image && detectionType === 'Image' && <img alt='selected' src={URL.createObjectURL(image)} className="img-thumbnail" />}
+            {image && detectionType === 'Video' && <video alt='selected' src={URL.createObjectURL(image)} controls autoPlay className="img-thumbnail" />}
           </div>
         </CardBody>
       </Card>

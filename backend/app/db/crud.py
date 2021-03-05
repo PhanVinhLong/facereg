@@ -2,6 +2,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 import typing as t
 
+import uuid 
+
 from . import models, schemas
 from app.core.security import get_password_hash
 
@@ -93,7 +95,7 @@ def create_model(db: Session, model: schemas.ModelCreate):
 def get_detections(
     db: Session, skip: int = 0, limit: int = 100
 ) -> t.List[schemas.Detection]:
-    return db.query(models.Detection).offset(skip).limit(limit).all()
+    return db.query(models.Detection).order_by(models.Detection.id.desc()).offset(skip).limit(limit).all()
 
 def get_pending_detections(
     db: Session, skip: int = 0, limit: int = 100
@@ -112,6 +114,49 @@ def create_detection(db: Session, detection: schemas.DetectionCreate, ori_filena
         ori_filename = ori_filename,
         res_filename = res_filename
     )
+    db.add(db_detection)
+    db.commit()
+    db.refresh(db_detection)
+    return db_detection
+
+def create_stream_detection(db: Session, detection: schemas.DetectionCreate):
+    db_detection = models.Detection(
+        name = detection.name,
+        detection_type = detection.detection_type,
+        model_id = detection.model_id,
+        created_time = detection.created_time,
+        created_by = detection.created_by,
+        status = detection.status,
+        description = detection.description,
+        ori_url = detection.ori_url
+    )
+
+    if not db_detection.ori_url:
+        db_detection.ori_url = 'rtmp://34.87.117.103:1935/live/' + uuid.uuid4().hex
+    db_detection.res_url = 'rtmp://34.87.117.103:1935/live/' + uuid.uuid4().hex
+
+    db.add(db_detection)
+    db.commit()
+    db.refresh(db_detection)
+    return db_detection
+
+def get_detection(db: Session, detection_id: int) -> schemas.Detection:
+    detection = db.query(models.Detection).filter(models.Detection.id == detection_id).first()
+    if not detection:
+        raise HTTPException(status_code=404, detail="Detection not found")
+    return detection
+
+def edit_detection(
+    db: Session, detection_id: int, detection: schemas.DetectionEdit
+) -> schemas.Detection:
+    db_detection = get_detection(db, detection_id)
+    if not db_detection:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Detection not found")
+    update_data = detection.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_detection, key, value)
+
     db.add(db_detection)
     db.commit()
     db.refresh(db_detection)

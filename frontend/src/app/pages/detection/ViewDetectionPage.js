@@ -1,10 +1,19 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory } from 'react-router-dom';
-import { useParams } from "react-router-dom";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { Input, Select } from "../../../_metronic/_partials/controls";
+import { useHistory, useParams } from 'react-router-dom';
 
-import { Card, CardHeader, CardHeaderToolbar, CardBody } from "../../../_metronic/_partials/controls";
+import axios from 'axios';
+import { BACKEND_URL } from '../../../config';
+
+import { Card, CardHeader, CardBody, CardHeaderToolbar } from "../../../_metronic/_partials/controls";
+
+import detectionAPI from "../../utils/DetectionAPI";
+
+const user = JSON.parse(localStorage.getItem('user'));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -15,51 +24,220 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     marginBottom: theme.spacing(2),
   },
-  table: {
-    minWidth: 750,
-    paddingRight: 15
-  },
-  tableWrapper: {
-    overflowX: 'auto'
-  },
 }));
 
+const FILE_SIZE = 25 * 1024;
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/gif",
+  "image/png"
+];
+
+function requiredWhenDefined() {
+  return this.nullable()
+    .default({})
+    .required();
+}
+
+Yup.addMethod(Yup.mixed, "requiredWhenDefined", requiredWhenDefined);
+
+const DetectionEditSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, "Minimum 2 symbols")
+    .max(50, "Maximum 50 symbols")
+    .required("Name is required"),
+  // description: Yup.string()
+  //   .min(2, "Minimum 2 symbols")
+  //   .max(500, "Maximum 500 symbols")
+  //   .required("Detection is required"),
+  image: Yup.mixed()
+    .requiredWhenDefined()
+    .test('required', "File is required", value => !(value && Object.keys(value).length === 0 && value.constructor === Object))
+    .test('type', "Unsupported File Format", value => SUPPORTED_FORMATS.includes(value.type))
+    .test('size', "File Size is too large", value => value.size >= FILE_SIZE)
+});
+
+const detectionTypes = ['Image', 'Video', 'Stream'];
+
 export function ViewDetectionPage() {
+
+  const history = useHistory();
+  const params = useParams();
+
   const classes = useStyles();
+
+  const btnRef = useRef();
+  const ref = useRef(null);
+
+  const [models, setModels] = React.useState([]);
+  const [detection, setDetection] = React.useState({});
 
   React.useEffect(() => {
     async function fetchData() {
-      //   const result = await axios(`${BACKEND_URL}/detections`);
-      //   setRows(result.data);
+      const result = await axios(`${BACKEND_URL}/models`);
+      setModels(result.data);
+
+      const result2 = await detectionAPI.getDetectionById(params.id);
+      setDetection({ ...result2.data, results: result2.data.results ? JSON.stringify(JSON.parse(result2.data.results), null, 4) : [] });
     }
     fetchData();
-  }, []);
+  }, [params]);
 
-  const params = useParams();
+  const initialValues = {
+    "name": "",
+    "detection_type": "Image",
+    "model_id": 1,
+    "description": "",
+    ...detection
+  }
 
-  const history = useHistory();
+  const disableForm = true;
 
   return (
     <div className={classes.root}>
       <Card>
-        <CardHeader title={`Detection ID ${params.id}`}>
+        <CardHeader title={`View Detection ${detection.name} (${detection.status})`}>
           <CardHeaderToolbar>
             <button
               type="button"
               className="btn btn-light"
               onClick={() => {
-                history.push("/detection");
+                history.push('/detection');
               }}
             >
               <i className="fa fa-arrow-left"></i>
-              Back
-            </button>
+            Back
+          </button>
+            {/* {`  `}
+            <button className="btn btn-light ml-2" onClick={() => {
+              setImage(null);
+              ref.current.resetForm(initialValues)
+            }}>
+              <i className="fa fa-redo"></i>
+            Reset
+          </button>
+            {`  `}
+            <button
+              type="submit"
+              onClick={() => {
+                if (btnRef && btnRef.current) {
+                  btnRef.current.click();
+                  // console.log(ref.current)
+                }
+              }}
+              className="btn btn-primary ml-2"
+            >
+              Save
+          </button> */}
           </CardHeaderToolbar>
         </CardHeader>
         <CardBody>
-          hello
+          <Formik
+            innerRef={ref}
+            enableReinitialize={true}
+            initialValues={initialValues}
+            validationSchema={DetectionEditSchema}
+            onSubmit={(values) => {
+              values = {
+                ...values,
+                created_time: new Date().toISOString(),
+                created_by: user.id,
+                status: 'Pending'
+              };
+              detectionAPI.createDetection(values)
+                .then(response => {
+                  if (response.status >= 200 && response.status < 300) {
+                    alert('New detection created successful.');
+                    history.push('/detection');
+                    history.go();
+                  } else {
+                    alert('Error status ' + String(response.status));
+                    history.push('/detection');
+                    history.go();
+                  }
+                });
+            }}
+          >
+            {({ handleSubmit, setFieldValue, errors, resetForm }) => (
+              <>
+                <Form className="form form-label-right">
+                  <div className="form-group row">
+                    <div className="col-lg-4">
+                      <Field
+                        name="name"
+                        component={Input}
+                        placeholder="Name"
+                        label="Name"
+                        disabled={disableForm}
+                      />
+                    </div>
+                    <div className="col-lg-4">
+                      <Select name="detection_type" label="Detection Type" disabled={disableForm}>
+                        {detectionTypes.map((dtype) => (
+                          <option key={dtype} value={dtype}>
+                            {dtype}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div className="col-lg-4">
+                      <Select name="model_id" label="Model" disabled={disableForm}>
+                        {models.map((model) => (
+                          <option key={model.id} value={model.name}>
+                            {model.name}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <Field
+                      name="description"
+                      as="textarea"
+                      className="form-control"
+                      disabled={disableForm}
+                    />
+                  </div>
+                  {detection.detection_type == 'Image' &&
+                  <div className="form-group">
+                    <label>Result</label>
+                    <Field
+                      name="results"
+                      as="textarea"
+                      rows="15"
+                      className="form-control"
+                      disabled={disableForm}
+                    />
+                  </div>}
+                  <button
+                    type="submit"
+                    ref={btnRef}
+                    style={{ display: "none" }}
+                    onSubmit={() => handleSubmit()}
+                  ></button>
+                </Form>
+              </>
+            )}
+          </Formik>
+          <div className="row">
+            <label className="col">Original</label>
+            {detection.status === 'Done' && <label className="col">Result</label>}
+          </div>
+          <div className="row">
+            <div className="text-center col">
+              {detection.detection_type === 'Image' && <img alt='result' src={`/api/files/${detection.ori_filename}`} className="img-thumbnail" />}
+              {detection.detection_type === 'Video' && <video alt='selected' src={`/api/files/${detection.ori_filename}`} controls autoPlay className="img-thumbnail" />}
+            </div>
+            {` `}
+            <div className="text-center col">
+              {detection.status === 'Done' && detection.detection_type === 'Image' && <img alt='result' src={`/api/files/${detection.res_filename}`} className="img-thumbnail" />}
+              {detection.status === 'Done' && detection.detection_type === 'Video' && <video alt='selected' src={`/api/files/${detection.res_filename}`} controls autoPlay className="img-thumbnail" />}
+            </div>
+          </div>
         </CardBody>
       </Card>
-    </div>
+    </div >
   );
 }

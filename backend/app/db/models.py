@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 
 from .session import Base
 
+import json
+
 class User(Base):
     __tablename__ = "users"
 
@@ -46,3 +48,6 @@ class Detection(Base):
     process_time = Column(Integer)
     results = Column(String)
     
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
