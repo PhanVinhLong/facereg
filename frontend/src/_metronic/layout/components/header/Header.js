@@ -30,14 +30,14 @@ export function Header() {
       >
         {/*begin::Container*/}
         <div className={` ${layoutProps.headerContainerClasses} d-flex align-items-stretch justify-content-between`}>
-          <AnimateLoading />
+          {/* <AnimateLoading /> */}
           {/*begin::Header Menu Wrapper*/}
-          {layoutProps.menuHeaderDisplay && <HeaderMenuWrapper />}
-          {!layoutProps.menuHeaderDisplay && <div />}
+          {/* {layoutProps.menuHeaderDisplay && <HeaderMenuWrapper />}
+          {!layoutProps.menuHeaderDisplay && <div />} */}
           {/*end::Header Menu Wrapper*/}
 
           {/*begin::Topbar*/}
-          <Topbar />
+          {/* <Topbar /> */}
           {/*end::Topbar*/}
         </div>
         {/*end::Container*/}

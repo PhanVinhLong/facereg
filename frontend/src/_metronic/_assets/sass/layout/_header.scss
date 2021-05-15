@@ -22,11 +22,11 @@
 		}
 
 		// Aside Enabled Mode
-		.aside-enabled & {
-			&.header-fixed {
-				left: get($aside-config, base, width);
-			}
-		}
+		// .aside-enabled & {
+		// 	&.header-fixed {
+		// 		left: get($aside-config, base, width);
+		// 	}
+		// }
 
 		// Fixed Header & Minimized Aside & Minimized Aside Hover Modes
 		.header-fixed.aside-minimize & {

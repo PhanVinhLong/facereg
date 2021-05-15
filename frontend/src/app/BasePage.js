@@ -1,7 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { Redirect, Switch, Route } from "react-router-dom";
 import { LayoutSplashScreen, ContentRoute } from "../_metronic/layout";
-import { BuilderPage } from "./pages/BuilderPage";
 
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { DetectionPage } from "./pages/detection/DetectionPage";
@@ -38,18 +37,7 @@ export default function BasePage() {
           <Redirect exact from="/" to="/dashboard" />
         }
         <ContentRoute path="/dashboard" component={DashboardPage} />
-        <ContentRoute path="/detection/new" component={NewDetectionPage} />
-        <ContentRoute path="/detection/new-stream" component={NewStreamDetectionPage} />
-        <ContentRoute path="/detection/stream/:id" component={ViewStreamDetectionPage} />
-        <ContentRoute path="/detection/:id" component={ViewDetectionPage} />
-        <ContentRoute path="/detection" component={DetectionPage} />
-        <ContentRoute path="/model" component={ModelPage} />
-
-        <ContentRoute path="/builder" component={BuilderPage} />
-        <Route path="/google-material" component={GoogleMaterialPage} />
-        <Route path="/react-bootstrap" component={ReactBootstrapPage} />
-        <Route path="/e-commerce" component={ECommercePage} />
-        <Route path="/user-profile" component={UserProfilepage} />
+        
         <Redirect to="error/error-v1" />
       </Switch>
     </Suspense>

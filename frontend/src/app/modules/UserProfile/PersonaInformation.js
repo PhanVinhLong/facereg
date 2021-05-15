@@ -326,7 +326,7 @@ function PersonaInformation(props) {
               <div className="input-group input-group-lg input-group-solid">
                 <input
                   type="text"
-                  placeholder="https://facebook.com/hitonasi"
+                  placeholder="https://facebook.com"
                   className={`form-control form-control-lg form-control-solid`}
                   name="website"
                   {...formik.getFieldProps("website")}

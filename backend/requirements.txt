@@ -19,10 +19,9 @@ sqlalchemy-utils==0.36.8
 python-multipart==0.0.5
 pyjwt==1.7.1
 aiofiles
-numpy==1.18.2
 torch==1.6.0
 torchvision==0.7.0
-tensorboardX==2.0
+tensorboardX==2.2
 matplotlib
 tqdm==4.43.0
 easydict==1.9
@@ -31,3 +30,6 @@ scikit-image
 opencv-contrib-python
 pycocotools
 moviepy
+bcolz==1.2.1
+scikit-learn==0.24.2
+numpy==1.20.2

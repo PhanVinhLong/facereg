@@ -7,6 +7,8 @@ WORKDIR /app
 RUN apt update && \
     apt install -y postgresql-client
 
+RUN apt-get install -y apt-utils
+
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends ca-certificates curl netbase wget && \
 	rm -rf /var/lib/apt/lists/*
@@ -25,6 +27,8 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends libbluetooth-dev tk-dev uuid-dev && \
 	rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update
 
 ENV GPG_KEY=E3FF2839C048B25C084DEBE9B26995E310250568
 ENV PYTHON_VERSION=3.8.7
@@ -63,6 +67,17 @@ RUN wget -O get-pip.py "$PYTHON_GET_PIP_URL" && \
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+RUN apt-get update && \
+	apt-get install -y libboost-all-dev
+
+RUN apt-get update && \
+	apt-get install -y libatlas-base-dev graphviz
+
+RUN pip install --no-cache-dir mxnet-cu102 graphviz
+
+RUN pip install --no-cache-dir tensorflow-gpu
+RUN pip install --upgrade numpy
 
 RUN apt-get update && \
     apt-get install libsm6 libxext6 x264 libx264-dev -y && \

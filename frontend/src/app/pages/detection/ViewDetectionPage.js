@@ -5,6 +5,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Input, Select } from "../../../_metronic/_partials/controls";
 import { useHistory, useParams } from 'react-router-dom';
+import ReactHlsPlayer from "react-hls-player";
 
 import axios from 'axios';
 import { BACKEND_URL } from '../../../config';
@@ -201,16 +202,16 @@ export function ViewDetectionPage() {
                     />
                   </div>
                   {detection.detection_type == 'Image' &&
-                  <div className="form-group">
-                    <label>Result</label>
-                    <Field
-                      name="results"
-                      as="textarea"
-                      rows="15"
-                      className="form-control"
-                      disabled={disableForm}
-                    />
-                  </div>}
+                    <div className="form-group">
+                      <label>Result</label>
+                      <Field
+                        name="results"
+                        as="textarea"
+                        rows="15"
+                        className="form-control"
+                        disabled={disableForm}
+                      />
+                    </div>}
                   <button
                     type="submit"
                     ref={btnRef}
@@ -221,21 +222,22 @@ export function ViewDetectionPage() {
               </>
             )}
           </Formik>
-          <div className="row">
-            <label className="col">Original</label>
-            {detection.status === 'Done' && <label className="col">Result</label>}
-          </div>
-          <div className="row">
-            <div className="text-center col">
-              {detection.detection_type === 'Image' && <img alt='result' src={`/api/files/${detection.ori_filename}`} className="img-thumbnail" />}
-              {detection.detection_type === 'Video' && <video alt='selected' src={`/api/files/${detection.ori_filename}`} controls autoPlay className="img-thumbnail" />}
-            </div>
-            {` `}
-            <div className="text-center col">
-              {detection.status === 'Done' && detection.detection_type === 'Image' && <img alt='result' src={`/api/files/${detection.res_filename}`} className="img-thumbnail" />}
-              {detection.status === 'Done' && detection.detection_type === 'Video' && <video alt='selected' src={`/api/files/${detection.res_filename}`} controls autoPlay className="img-thumbnail" />}
-            </div>
-          </div>
+          <ReactHlsPlayer
+            src="http://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
+            autoPlay={true}
+            controls={true}
+            width="400px"
+            height="auto"
+          />
+          <ReactHlsPlayer
+            src="http://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
+            autoPlay={true}
+            controls={true}
+            width="45%"
+            height="auto"
+            style={{ marginLeft: 30 }}
+          />
+          <br />
         </CardBody>
       </Card>
     </div >

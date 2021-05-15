@@ -10,7 +10,7 @@ export default [
     refreshToken: "access-token-f8c137a2c98743f48b643e71161d90aa",
     roles: [1], // Administrator
     pic: toAbsoluteUrl("/media/users/300_21.jpg"),
-    fullname: "Long Phan",
+    fullname: "Song",
     firstname: "Long",
     lastname: "Phan",
     occupation: "CEO",
@@ -18,7 +18,7 @@ export default [
     phone: "0971 823 458",
     language: "en",
     timeZone: "International Date Line West",
-    website: "https://facebook.com/hitonasi",
+    website: "https://facebook.com",
     emailSettings: {
       emailNotification: true,
       sendCopyToPersonalEmail: false,
