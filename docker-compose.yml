@@ -31,21 +31,21 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 
-  worker:
-    build:
-      context: backend
-      dockerfile: Dockerfile
-    command: celery --app app.tasks worker -P solo --loglevel=DEBUG -Q main-queue -c 1
-    volumes:
-      - ./worker:/app/:cached
-      - ./.docker/.ipython:/root/.ipython:cached
-    environment:
-      DATABASE_URL: 'postgresql://ydemo:123456@postgres:5432/ydemo'
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - capabilities: [gpu]
+  # worker:
+  #   build:
+  #     context: backend
+  #     dockerfile: Dockerfile
+  #   command: celery --app app.tasks worker -P solo --loglevel=DEBUG -Q main-queue -c 1
+  #   volumes:
+  #     - ./worker:/app/:cached
+  #     - ./.docker/.ipython:/root/.ipython:cached
+  #   environment:
+  #     DATABASE_URL: 'postgresql://ydemo:123456@postgres:5432/ydemo'
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - capabilities: [gpu]
 
   flower:  
     image: mher/flower

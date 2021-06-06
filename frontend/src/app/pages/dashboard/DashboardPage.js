@@ -47,8 +47,9 @@ export function DashboardPage() {
 
   const [images, setImages] = React.useState();
   const [url, setUrl] = React.useState("");
-  const [isSubmited, setIsSubmited] = React.useState(false);
+  const [isSubmited, setIsSubmited] = React.useState(true);
   const [imageUrls, setImageUrls] = React.useState();
+  const [imageUrl, setImageUrl] = React.useState();
 
   const btnRef = useRef();
   const ref = useRef(null);
@@ -57,7 +58,7 @@ export function DashboardPage() {
     try {
       // const result = await axios(`${BACKEND_URL}/faces/image`);
       // console.log(result)
-      setUrl("http://115.78.96.177/api/file/" + String(new Date().valueOf()));
+      setImageUrl("http://115.78.96.177/api/v1//faces/rimage/" + String(new Date().valueOf()));
 
     } catch (err) {
       console.error(err.message);
@@ -68,7 +69,7 @@ export function DashboardPage() {
     // getData()
     const interval = setInterval(() => {
       getData()
-    }, 1000)
+    }, 500)
     return () => clearInterval(interval)
   }, []);
 
@@ -155,14 +156,15 @@ export function DashboardPage() {
                   <label>Result</label>
                   <div className="d-flex flex-row">
                     <ReactPlayer
-                      url="https://cdn3.wowza.com/1/Vjl3R1Y1WVYxSDhz/cTNNRFBh/hls/live/playlist.m3u8"
+                      url={url}
                       playing
                       muted
                       width="48%"
                       height="auto"
                     />
                     <Image
-                      src={url}
+                      // src={url}
+                      src={imageUrl}
                       width="48%"
                       height="auto"
                       style={{ marginLeft: 30 }}
