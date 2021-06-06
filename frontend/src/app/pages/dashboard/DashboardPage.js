@@ -47,7 +47,7 @@ export function DashboardPage() {
 
   const [images, setImages] = React.useState();
   const [url, setUrl] = React.useState("");
-  const [isSubmited, setIsSubmited] = React.useState(true);
+  const [isSubmited, setIsSubmited] = React.useState(false);
   const [imageUrls, setImageUrls] = React.useState();
   const [imageUrl, setImageUrl] = React.useState();
 
@@ -91,7 +91,6 @@ export function DashboardPage() {
             onSubmit={(values) => {
               // console.log(values.Url);
               // console.log(images);
-              setIsSubmited(true);
 
               setUrl(values.Url);
               detectionAPI.createFacereg(values.Url, images)
@@ -99,10 +98,11 @@ export function DashboardPage() {
                   if (response.status >= 200 && response.status < 300) {
                     
                     alert('New detection created successful.');
+                    setIsSubmited(true);
                     // history.push(`/detection/${response.data.id}`);
                     // history.go();
                   } else {
-                    // alert('Error status ' + String(response.status));
+                    alert('Error status ' + String(response.status));
                     // history.push('/detection/');
                     // history.go();
                   }

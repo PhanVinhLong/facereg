@@ -205,4 +205,4 @@ async def image_face_detection(
     # face_reg_task(url)
     # created_task = celery_app.send_task("app.tasks.face_reg_task", args=[url])
 
-    return {"result": "ok"}
+    return {"result": "okk"}
