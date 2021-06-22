@@ -3,12 +3,6 @@ import { Redirect, Switch, Route } from "react-router-dom";
 import { LayoutSplashScreen, ContentRoute } from "../_metronic/layout";
 
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
-import { DetectionPage } from "./pages/detection/DetectionPage";
-import { NewDetectionPage } from "./pages/detection/NewDetectionPage";
-import { NewStreamDetectionPage } from "./pages/detection/NewStreamDetectionPage";
-import { ViewStreamDetectionPage } from "./pages/detection/ViewStreamDetectionPage";
-import { ViewDetectionPage } from "./pages/detection/ViewDetectionPage";
-import { ModelPage } from "./pages/model/ModelPage";
 
 const GoogleMaterialPage = lazy(() =>
   import("./modules/GoogleMaterialExamples/GoogleMaterialPage")

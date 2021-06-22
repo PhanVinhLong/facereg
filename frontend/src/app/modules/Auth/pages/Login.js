@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { connect } from "react-redux";
 import { FormattedMessage, injectIntl } from "react-intl";
-import auth from "../../../utils/AuthAPI";
 import { createBrowserHistory } from 'history';
 
 /*
@@ -73,25 +72,25 @@ function Login(props) {
     validationSchema: LoginSchema,
     onSubmit: (values, { setStatus, setSubmitting }) => {
       enableLoading();
-      setTimeout(() => {
-        auth.login(values.email, values.password)
-        // .then(data => console.log(data))
-          .then((access_token) => {
-            disableLoading();
-            // setIsLoggedIn(true);
-            history.push("/");
-            history.go();
-          })
-          .catch(() => {
-            disableLoading();
-            setSubmitting(false);
-            setStatus(
-              intl.formatMessage({
-                id: "AUTH.VALIDATION.INVALID_LOGIN",
-              })
-            );
-          });
-      }, 1000);
+    //   setTimeout(() => {
+    //     auth.login(values.email, values.password)
+    //     // .then(data => console.log(data))
+    //       .then((access_token) => {
+    //         disableLoading();
+    //         // setIsLoggedIn(true);
+    //         history.push("/");
+    //         history.go();
+    //       })
+    //       .catch(() => {
+    //         disableLoading();
+    //         setSubmitting(false);
+    //         setStatus(
+    //           intl.formatMessage({
+    //             id: "AUTH.VALIDATION.INVALID_LOGIN",
+    //           })
+    //         );
+    //       });
+    //   }, 1000);
     },
   });
 
@@ -183,4 +182,4 @@ function Login(props) {
   );
 }
 
-export default injectIntl(connect(null, auth.actions)(Login));
+export default injectIntl(connect()(Login));

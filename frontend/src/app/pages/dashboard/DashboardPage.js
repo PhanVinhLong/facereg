@@ -2,14 +2,11 @@ import React, { useRef } from 'react';
 import { Formik, Form, Field } from "formik";
 import { Image, Row, Col } from "react-bootstrap";
 import * as Yup from "yup";
-import { useHistory } from 'react-router-dom';
-import { Input, Select } from "../../../_metronic/_partials/controls";
+import { Input } from "../../../_metronic/_partials/controls";
 import 'chart.js';
-import ReactHlsPlayer from "react-hls-player";
 import ReactPlayer from 'react-player';
 
 import axios from 'axios';
-import { BACKEND_URL } from '../../../config';
 
 import {
   Card, CardHeader, CardBody
