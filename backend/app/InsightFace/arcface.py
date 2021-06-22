@@ -11,10 +11,11 @@ import shutil
 import yolo_detection
 import os
 import random
+from cv2_resize_tile import concat_tile_resize
 
-from yolov4.tool.utils import *
-from yolov4.tool.torch_utils import *
-from yolov4.tool.darknet2pytorch import Darknet
+# from yolov4.tool.utils import *
+# from yolov4.tool.torch_utils import *
+# from yolov4.tool.darknet2pytorch import Darknet
 
 THRESHOLD = 1.54
 FACEBANK_DIR = "./app/InsightFace/data/facebank/current_face"
@@ -41,6 +42,14 @@ class Recognition:
         # self.model = Darknet(config_file)
         # self.model.load_weights(weight_file)
         # self.model.cuda()
+
+    def update_old_facebank(self, stream_url):
+        self.stream_url = stream_url
+        self.cap = cv2.VideoCapture(self.stream_url)
+        self.cap.set(cv2.CAP_PROP_POS_MSEC, random.randint(3, 1000))
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+        self.targets, self.names = prepare_facebank(self.conf, self.learner.model, self.mtcnn, tta = True)
+        print('facebank updated')
 
     def update_facebank(self, files, stream_url):
         self.stream_url = stream_url
@@ -72,6 +81,7 @@ class Recognition:
         boxes, confidences, classIDs = yolo_detection.detect_bboxes(self.net, self.ln, image)
         boxes = boxes[:20]
         faces = []
+        np_faces = []
         for i in range(len(boxes)):
             # extract the bounding box coordinates
             (x, y) = (boxes[i][0], boxes[i][1])
@@ -89,45 +99,48 @@ class Recognition:
                 pillow_image = Image.fromarray(cv2.cvtColor(crop_face, cv2.COLOR_BGR2RGB))
                 face = pillow_image.resize((112,112))
                 faces.append(face)
+                np_faces.append(crop_face)
             except:
                 continue
         face_ids = range(len(faces))
-        return boxes, faces, face_ids
+        return boxes, faces, face_ids, np_faces
 
     # def detect_yolo_gpu(img):
-        height, width, _ = img.shape
-        sized = cv2.resize(img, (self.model.width, self.model.height))
-        sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
+        # height, width, _ = img.shape
+        # sized = cv2.resize(img, (self.model.width, self.model.height))
+        # sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
 
-        result = []
-        faces = []
-        for i in range(2):
-            boxes = do_detect(model, sized, 0.4, 0.6, use_cuda)[0]
-            if i==1:
-                for box in boxes:
-                    x = int(box[0] * width)
-                    y = int(box[1] * height)
-                    w = int(box[2] * width) - x
-                    h = int(box[3] * height) - y
-                    result.append([x, y, w, h])
+        # result = []
+        # faces = []
+        # np_faces = []
+        # for i in range(2):
+        #     boxes = do_detect(model, sized, 0.4, 0.6, use_cuda)[0]
+        #     if i==1:
+        #         for box in boxes:
+        #             x = int(box[0] * width)
+        #             y = int(box[1] * height)
+        #             w = int(box[2] * width) - x
+        #             h = int(box[3] * height) - y
+        #             result.append([x, y, w, h])
 
-                    # crop and save face
-                    DELTA_y = int(0.1 * h)
-                    DELTA_x = int(0.2 * w)
-                    crop_face = img[y-DELTA_y*2:y+h+DELTA_y,x-DELTA_x:x+w+DELTA_x].copy()
-
-                    try:
-                        pillow_image = Image.fromarray(cv2.cvtColor(crop_face, cv2.COLOR_BGR2RGB))
-                        face = pillow_image.resize((112,112))
-                        faces.append(face)
-                    except:
-                        continue
-        face_ids = range(len(faces))
-        return result, faces, face_ids
+        #             # crop and save face
+        #             DELTA_y = int(0.1 * h)
+        #             DELTA_x = int(0.2 * w)
+        #             crop_face = img[y-DELTA_y*2:y+h+DELTA_y,x-DELTA_x:x+w+DELTA_x].copy()
+                    
+        #             try:
+        #                 pillow_image = Image.fromarray(cv2.cvtColor(crop_face, cv2.COLOR_BGR2RGB))
+        #                 face = pillow_image.resize((112,112))
+        #                 faces.append(face)
+        #                 np_faces.append(crop_face)
+        #             except:
+        #                 continue
+        # face_ids = range(len(faces))
+        # return result, faces, face_ids, np_faces
 
     def draw_min_face(self, image):
         TIME1 = time.time()
-        boxes, faces, face_ids = self.detect_yolo(image)
+        boxes, faces, face_ids, np_faces = self.detect_yolo(image)
         if(len(face_ids) == 0):
             return image
         TIME2 = time.time()
@@ -144,6 +157,9 @@ class Recognition:
         cv2.putText(image, text, (x+w+5, y), cv2.FONT_HERSHEY_SIMPLEX,2, (0,0,255), 4)
 
         image = cv2.resize(image, (768, 432), interpolation = cv2.INTER_AREA)
+        faces_image = concat_tile_resize([[np_faces[min_face_id]], [np_faces[0], np_faces[1]], [np_faces[2], np_faces[3]]])
+        faces_image = cv2.resize(faces_image, (216, 432), interpolation = cv2.INTER_AREA)
+        image = concat_tile_resize([[image, faces_image]])
         torch.cuda.empty_cache()
         res, im_png = cv2.imencode(".png", image)
         TIME4 = time.time()
@@ -153,6 +169,7 @@ class Recognition:
         # fname = str(time.time()) + ".png"
         # cv2.imwrite("./app/droneface/libs/insight_face/InsightFace_Pytorch/tests/" + fname, image)
         # print("./app/droneface/libs/insight_face/InsightFace_Pytorch/tests/" + fname)
+        # return im_png
         return im_png
 
     def cap_and_draw_min_face(self):

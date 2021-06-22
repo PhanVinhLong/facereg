@@ -122,7 +122,7 @@ export function DashboardPage() {
                     <label>Select Face Images</label>
                     <Row >
                       {imageUrls && imageUrls.map(url =>
-                        <Col xs={4} md={3}>
+                        <Col xs={4} md={2}>
                           <Image src={url} alt={url} thumbnail key={url} />
                         </Col>
                       )}
@@ -155,14 +155,14 @@ export function DashboardPage() {
                       url={url}
                       playing
                       muted
-                      width="48%"
+                      width="45%"
                       height="auto"
                     />
                     <Image
                       // src={url}
                       src={"http://115.78.96.177/api/v1/feed"}
                       // src={imageUrl}
-                      width="48%"
+                      width="51%"
                       height="auto"
                       style={{ marginLeft: 30 }}
                     />
