@@ -58,7 +58,7 @@ export function DashboardPage() {
     try {
       // const result = await axios(`${BACKEND_URL}/faces/image`);
       // console.log(result)
-      setImageUrl("http://115.78.96.177/api/v1//faces/rimage/" + String(new Date().valueOf()));
+      setImageUrl("http://115.78.96.177/api/v1/recognize_image/" + String(new Date().valueOf()));
 
     } catch (err) {
       console.error(err.message);
@@ -67,10 +67,9 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     // getData()
-    const interval = setInterval(() => {
+    setInterval(() => {
       getData()
-    }, 500)
-    return () => clearInterval(interval)
+    }, 400)
   }, []);
 
   const initialValues = {
@@ -96,7 +95,7 @@ export function DashboardPage() {
               detectionAPI.createFacereg(values.Url, images)
                 .then(response => {
                   if (response.status >= 200 && response.status < 300) {
-                    
+
                     alert('New detection created successful.');
                     setIsSubmited(true);
                     // history.push(`/detection/${response.data.id}`);
@@ -144,7 +143,7 @@ export function DashboardPage() {
                         <>Please select <b>{"Face Images"}</b></>
                     }
                   </div>
-                  <button className="btn btn-primary"f
+                  <button className="btn btn-primary" f
                     type="submit"
                     // ref={btnRef}
                     // style={{ display: "none" }}
@@ -164,7 +163,8 @@ export function DashboardPage() {
                     />
                     <Image
                       // src={url}
-                      src={imageUrl}
+                      src={"http://115.78.96.177/api/v1/feed"}
+                      // src={imageUrl}
                       width="48%"
                       height="auto"
                       style={{ marginLeft: 30 }}

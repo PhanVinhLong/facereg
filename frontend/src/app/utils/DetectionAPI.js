@@ -72,7 +72,7 @@ const detectionAPI = {
 
     return axios({
       method: 'post',
-      url: '/api/v1/faces/upload?url=' + url,
+      url: '/api/v1/update_facebank?url=' + url,
       data: bodyFormData,
       headers: {
         'Content-Type': 'multipart/form-data'

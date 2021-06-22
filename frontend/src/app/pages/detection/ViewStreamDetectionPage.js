@@ -61,7 +61,8 @@ export function ViewStreamDetectionPage() {
       setDetection({
         ...result2.data,
         hls_ori_url: 'http://34.87.117.103:8080/hls/' + result2.data.ori_url.replace('rtmp://34.87.117.103:1935/live/', '') + '.m3u8',
-        hls_res_url: 'http://34.87.117.103:8080/hls/' + result2.data.res_url.replace('rtmp://34.87.117.103:1935/live/', '') + '.m3u8'
+        // hls_res_url: 'http://34.87.117.103:8080/hls/' + result2.data.res_url.replace('rtmp://34.87.117.103:1935/live/', '') + '.m3u8'
+        hls_res_url: "https://demo.bahien.com/live/stream/playlist.m3u8"
       });
       console.log(result2.data)
       console.log('http://34.87.117.103:8080/hls/' + result2.data.res_url.replace('rtmp://34.87.117.103:1935/live/', '') + '.m3u8')

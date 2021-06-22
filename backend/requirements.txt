@@ -33,3 +33,4 @@ moviepy
 bcolz==1.2.1
 scikit-learn==0.24.2
 numpy==1.20.2
+pyshine
