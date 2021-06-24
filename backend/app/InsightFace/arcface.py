@@ -12,15 +12,19 @@ import yolo_detection
 import os
 import random
 from cv2_resize_tile import concat_tile_resize
+import numpy as np
 
-# from yolov4.tool.utils import *
-# from yolov4.tool.torch_utils import *
-# from yolov4.tool.darknet2pytorch import Darknet
+from mtcnn import MTCNN
+
+from yolov4.tool.utils import *
+from yolov4.tool.torch_utils import *
+from yolov4.tool.darknet2pytorch import Darknet
 
 THRESHOLD = 1.54
 FACEBANK_DIR = "./app/InsightFace/data/facebank/current_face"
 config_file = "./app/InsightFace/yolov4/models/yolov4-tiny-3l.cfg"
 weight_file = "./app/InsightFace/yolov4/models/yolov4-tiny-3l.weights"
+USE_CUDA = True
 
 class Recognition:
     def __init__(self):
@@ -39,9 +43,9 @@ class Recognition:
         print('facebank loaded')
         self.net, self.ln = yolo_detection.init_net()
         print('yolo model loaded')
-        # self.model = Darknet(config_file)
-        # self.model.load_weights(weight_file)
-        # self.model.cuda()
+        self.model = Darknet(config_file)
+        self.model.load_weights(weight_file)
+        self.model.cuda()
 
     def update_old_facebank(self, stream_url):
         self.stream_url = stream_url
@@ -51,7 +55,7 @@ class Recognition:
         self.targets, self.names = prepare_facebank(self.conf, self.learner.model, self.mtcnn, tta = True)
         print('facebank updated')
 
-    def update_facebank(self, files, stream_url):
+    async def update_facebank(self, files, stream_url):
         self.stream_url = stream_url
         self.cap = cv2.VideoCapture(self.stream_url)
         self.cap.set(cv2.CAP_PROP_POS_MSEC, random.randint(3, 1000))
@@ -59,8 +63,13 @@ class Recognition:
         shutil.rmtree(FACEBANK_DIR, ignore_errors=False, onerror=None)
         os.makedirs(FACEBANK_DIR)
         for file in files:
-            with open(os.path.join(FACEBANK_DIR, file.filename), "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
+            content = await file.read()
+            nparr = np.fromstring(content, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            boxes, faces, face_ids, np_faces = self.detect_yolo_gpu(img)
+            for idx, face in enumerate(faces):
+                with open(os.path.join(FACEBANK_DIR, str(idx) + "_" + file.filename), "wb") as buffer:
+                    shutil.copyfileobj(face, buffer)
         self.targets, self.names = prepare_facebank(self.conf, self.learner.model, self.mtcnn, tta = True)
         print('facebank updated')
 
@@ -105,42 +114,42 @@ class Recognition:
         face_ids = range(len(faces))
         return boxes, faces, face_ids, np_faces
 
-    # def detect_yolo_gpu(img):
-        # height, width, _ = img.shape
-        # sized = cv2.resize(img, (self.model.width, self.model.height))
-        # sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
+    def detect_yolo_gpu(self, img):
+        height, width, _ = img.shape
+        sized = cv2.resize(img, (self.model.width, self.model.height))
+        sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
 
-        # result = []
-        # faces = []
-        # np_faces = []
-        # for i in range(2):
-        #     boxes = do_detect(model, sized, 0.4, 0.6, use_cuda)[0]
-        #     if i==1:
-        #         for box in boxes:
-        #             x = int(box[0] * width)
-        #             y = int(box[1] * height)
-        #             w = int(box[2] * width) - x
-        #             h = int(box[3] * height) - y
-        #             result.append([x, y, w, h])
+        result = []
+        faces = []
+        np_faces = []
+        for i in range(2):
+            boxes = do_detect(self.model, sized, 0.4, 0.6, USE_CUDA)[0]
+            if i==1:
+                for box in boxes:
+                    x = int(box[0] * width)
+                    y = int(box[1] * height)
+                    w = int(box[2] * width) - x
+                    h = int(box[3] * height) - y
+                    result.append([x, y, w, h])
 
-        #             # crop and save face
-        #             DELTA_y = int(0.1 * h)
-        #             DELTA_x = int(0.2 * w)
-        #             crop_face = img[y-DELTA_y*2:y+h+DELTA_y,x-DELTA_x:x+w+DELTA_x].copy()
+                    # crop and save face
+                    DELTA_y = int(0.1 * h)
+                    DELTA_x = int(0.2 * w)
+                    crop_face = img[y-DELTA_y*2:y+h+DELTA_y,x-DELTA_x:x+w+DELTA_x].copy()
                     
-        #             try:
-        #                 pillow_image = Image.fromarray(cv2.cvtColor(crop_face, cv2.COLOR_BGR2RGB))
-        #                 face = pillow_image.resize((112,112))
-        #                 faces.append(face)
-        #                 np_faces.append(crop_face)
-        #             except:
-        #                 continue
-        # face_ids = range(len(faces))
-        # return result, faces, face_ids, np_faces
+                    try:
+                        np_faces.append(crop_face)
+                        pillow_image = Image.fromarray(cv2.cvtColor(crop_face, cv2.COLOR_BGR2RGB))
+                        face = pillow_image.resize((112,112))
+                        faces.append(face)
+                    except:
+                        continue
+        face_ids = range(len(faces))
+        return result, faces, face_ids, np_faces
 
     def draw_min_face(self, image):
         TIME1 = time.time()
-        boxes, faces, face_ids, np_faces = self.detect_yolo(image)
+        boxes, faces, face_ids, np_faces = self.detect_yolo_gpu(image)
         if(len(face_ids) == 0):
             return image
         TIME2 = time.time()
@@ -153,7 +162,7 @@ class Recognition:
         (w, h) = (boxes[min_face_id][2], boxes[min_face_id][3])
 
         cv2.rectangle(image, (x, y), (x + w, y + h), (0,255,0), 3)
-        text = "{}: {:.4f}".format("target", min_face_score)
+        text = "{:.4f}".format(min_face_score)
         cv2.putText(image, text, (x+w+5, y), cv2.FONT_HERSHEY_SIMPLEX,2, (0,0,255), 4)
 
         image = cv2.resize(image, (768, 432), interpolation = cv2.INTER_AREA)

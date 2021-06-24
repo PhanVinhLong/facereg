@@ -56,11 +56,13 @@ app.add_middleware(
 )
 
 def generate():
-    while True:
-        flag, encodedImage = recognition.cap_and_draw_min_face()
-        if not flag:
-            continue
-        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+    while recognition.cap.isOpened():
+        ret, img = recognition.cap.read()
+        if ret == True:
+            img = recognition.draw_min_face(img)
+            yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(img) + b'\r\n')
+        else:
+            pass
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
@@ -71,7 +73,6 @@ async def db_session_middleware(request: Request, call_next):
 def video_feed(
     request: Request,
 ):
-    headers = {"Cache-Control": "no-store, no-cache"}
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 
 @app.post("/api/v1/update_facebank")

@@ -35,11 +35,7 @@ ENV PYTHON_VERSION=3.8.7
 
 RUN wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" && \
 	wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" && \
-	export GNUPGHOME="$(mktemp -d)" && \
-	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" && \
-	gpg --batch --verify python.tar.xz.asc python.tar.xz && \
-	{ command -v gpgconf > /dev/null && gpgconf --kill all || :; } && \
-	rm -rf "$GNUPGHOME" python.tar.xz.asc && mkdir -p /usr/src/python && \
+	mkdir -p /usr/src/python && \
 	tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz	&& \
 	rm python.tar.xz && \
 	cd /usr/src/python && \
